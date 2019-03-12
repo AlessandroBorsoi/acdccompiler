@@ -52,7 +52,7 @@ class ScannerTest {
 
         assertEquals(FLOAT, token.getType());
         assertNull(token.getValue());
-        assertEquals("<FLOAT>", token.toString());
+        assertEquals("<FLOAT,r:1>", token.toString());
     }
 
     @Test
@@ -63,7 +63,7 @@ class ScannerTest {
 
         assertEquals(INT, token.getType());
         assertNull(token.getValue());
-        assertEquals("<INT>", token.toString());
+        assertEquals("<INT,r:1>", token.toString());
     }
 
     @Test
@@ -85,7 +85,7 @@ class ScannerTest {
 
         assertEquals(PRINT, token.getType());
         assertNull(token.getValue());
-        assertEquals("<PRINT>", token.toString());
+        assertEquals("<PRINT,r:1>", token.toString());
     }
 
     @Test
@@ -140,37 +140,57 @@ class ScannerTest {
 
         assertEquals(ID, token.getType());
         assertEquals("a", token.getValue());
-        assertEquals("<ID,a>", token.toString());
+        assertEquals("<ID,r:1,a>", token.toString());
     }
 
-    @ParameterizedTest
-    @ValueSource(strings = {"src.txt", "srcWithOnlyNecessarySpaces.txt", "srcWithRandomSpaces.txt"})
-    void srcProgramFileScannerReturnsAValidStreamOfTokens(String fileName) throws Exception {
-        Scanner scanner = new Scanner(getFile(fileName));
+    @Test
+    void srcProgramFileScannerReturnsAValidStreamOfTokens() throws Exception {
+        Scanner scanner = new Scanner(getFile("src.txt"));
 
-        assertEquals("<FLOAT>", scanner.nextToken().toString());
-        assertEquals("<ID,b>", scanner.nextToken().toString());
-        assertEquals("<INT>", scanner.nextToken().toString());
-        assertEquals("<ID,a>", scanner.nextToken().toString());
-        assertEquals("<ID,a>", scanner.nextToken().toString());
-        assertEquals("<ASSIGN>", scanner.nextToken().toString());
-        assertEquals("<INUM,5>", scanner.nextToken().toString());
-        assertEquals("<ID,b>", scanner.nextToken().toString());
-        assertEquals("<ASSIGN>", scanner.nextToken().toString());
-        assertEquals("<ID,a>", scanner.nextToken().toString());
-        assertEquals("<PLUS>", scanner.nextToken().toString());
-        assertEquals("<FNUM,3.2>", scanner.nextToken().toString());
-        assertEquals("<PRINT>", scanner.nextToken().toString());
-        assertEquals("<ID,b>", scanner.nextToken().toString());
-        assertEquals("<EOF>", scanner.nextToken().toString());
+        assertEquals("<FLOAT,r:1>", scanner.nextToken().toString());
+        assertEquals("<ID,r:1,b>", scanner.nextToken().toString());
+        assertEquals("<INT,r:2>", scanner.nextToken().toString());
+        assertEquals("<ID,r:2,a>", scanner.nextToken().toString());
+        assertEquals("<ID,r:3,a>", scanner.nextToken().toString());
+        assertEquals("<ASSIGN,r:3>", scanner.nextToken().toString());
+        assertEquals("<INUM,r:3,5>", scanner.nextToken().toString());
+        assertEquals("<ID,r:4,b>", scanner.nextToken().toString());
+        assertEquals("<ASSIGN,r:4>", scanner.nextToken().toString());
+        assertEquals("<ID,r:4,a>", scanner.nextToken().toString());
+        assertEquals("<PLUS,r:4>", scanner.nextToken().toString());
+        assertEquals("<FNUM,r:4,3.2>", scanner.nextToken().toString());
+        assertEquals("<PRINT,r:5>", scanner.nextToken().toString());
+        assertEquals("<ID,r:5,b>", scanner.nextToken().toString());
+        assertEquals("<EOF,r:6>", scanner.nextToken().toString());
+    }
+
+    @Test
+    void srcWithRandomSpacesProgramFileScannerReturnsAValidStreamOfTokens() throws Exception {
+        Scanner scanner = new Scanner(getFile("srcWithRandomSpaces.txt"));
+
+        assertEquals("<FLOAT,r:1>", scanner.nextToken().toString());
+        assertEquals("<ID,r:3,b>", scanner.nextToken().toString());
+        assertEquals("<INT,r:4>", scanner.nextToken().toString());
+        assertEquals("<ID,r:5,a>", scanner.nextToken().toString());
+        assertEquals("<ID,r:7,a>", scanner.nextToken().toString());
+        assertEquals("<ASSIGN,r:7>", scanner.nextToken().toString());
+        assertEquals("<INUM,r:9,5>", scanner.nextToken().toString());
+        assertEquals("<ID,r:9,b>", scanner.nextToken().toString());
+        assertEquals("<ASSIGN,r:9>", scanner.nextToken().toString());
+        assertEquals("<ID,r:9,a>", scanner.nextToken().toString());
+        assertEquals("<PLUS,r:9>", scanner.nextToken().toString());
+        assertEquals("<FNUM,r:9,3.2>", scanner.nextToken().toString());
+        assertEquals("<PRINT,r:10>", scanner.nextToken().toString());
+        assertEquals("<ID,r:14,b>", scanner.nextToken().toString());
+        assertEquals("<EOF,r:29>", scanner.nextToken().toString());
     }
 
     @ParameterizedTest
     @ValueSource(strings = {
             "invalidId.txt",
             "invalidSymbol.txt",
-            "invalidFloatdcl.txt",
-            "invalidIntdcl.txt",
+            "invalidFloat.txt",
+            "invalidInt.txt",
             "invalidPrint.txt"})
     void invalidIdThrowsLexicalException(String fileName) throws Exception {
         Scanner scanner = new Scanner(getFile(fileName));
@@ -182,11 +202,11 @@ class ScannerTest {
     void srcProgramWithMixedValidAndInvalidTokens() throws Exception {
         Scanner scanner = new Scanner(getFile("mixed.txt"));
 
-        assertEquals("<ID,b>", scanner.nextToken().toString());
+        assertEquals("<ID,r:1,b>", scanner.nextToken().toString());
         assertThrows(LexicalException.class, scanner::peekToken, "<INVALID,@>");
         assertThrows(LexicalException.class, scanner::nextToken, "<INVALID,@>");
-        assertEquals("<ASSIGN>", scanner.peekToken().toString());
-        assertEquals("<ASSIGN>", scanner.nextToken().toString());
+        assertEquals("<ASSIGN,r:1>", scanner.peekToken().toString());
+        assertEquals("<ASSIGN,r:1>", scanner.nextToken().toString());
         assertThrows(LexicalException.class, scanner::peekToken, "<INVALID,invalid>");
         assertThrows(LexicalException.class, scanner::nextToken, "<INVALID,invalid>");
         assertEquals("<FNUM,3.2>", scanner.nextToken().toString());

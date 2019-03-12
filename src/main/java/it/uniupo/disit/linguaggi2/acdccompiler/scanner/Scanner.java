@@ -31,13 +31,13 @@ class Scanner {
     private Token nextToken;
     private int row;
 
-    public Scanner(String fileName) throws FileNotFoundException {
+    Scanner(String fileName) throws FileNotFoundException {
         this.buffer = new PushbackReader(new FileReader(fileName));
         this.nextToken = null;
         this.row = 1;
     }
 
-    public Token nextToken() throws IOException, LexicalException {
+    Token nextToken() throws IOException, LexicalException {
         Token currentToken;
         if (nextToken == null) {
             currentToken = scanNextToken();
@@ -48,7 +48,7 @@ class Scanner {
         return checkInvalid(currentToken);
     }
 
-    public Token peekToken() throws IOException, LexicalException {
+    Token peekToken() throws IOException, LexicalException {
         if (nextToken == null)
             nextToken = scanNextToken();
         return checkInvalid(nextToken);
@@ -112,11 +112,12 @@ class Scanner {
     }
 
     private Token scanId(char nextChar) throws IOException {
-        StringBuilder builder = new StringBuilder().append(nextChar);
-        while (isLetter(nextChar) && isLowerCase(nextChar)) {
+        StringBuilder builder = new StringBuilder();
+        do {
             builder.append(nextChar);
             nextChar = readChar();
-        }
+        } while (isLetter(nextChar) && isLowerCase(nextChar));
+        buffer.unread(nextChar);
         String id = builder.toString();
         if (KEYWORDS.containsKey(id))
             return Token.of(row, KEYWORDS.get(id));

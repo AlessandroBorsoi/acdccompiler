@@ -1,5 +1,5 @@
-f b
-i a
+float b
+int a
 a = 5
 b = a + 3.2
-p b
+print b
