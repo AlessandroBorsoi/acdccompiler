@@ -124,10 +124,8 @@ class Scanner {
         return Token.of(row, ID, id);
     }
 
-    private boolean isEOF(int nextChar) {
-        // The second control is for managing this:
-        // https://bugs.java.com/bugdatabase/view_bug.do?bug_id=5031992
-        return nextChar == -1 || nextChar == 65535;
+    private boolean isEOF(char nextChar) {
+        return nextChar == 0xFFFF;
     }
 
     private Token getInvalidToken(int nextChar) throws IOException {

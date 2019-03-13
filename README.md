@@ -1,5 +1,5 @@
 # acdccompiler
 
-## Build
+## Build and test
 ```mvn clean install```
 

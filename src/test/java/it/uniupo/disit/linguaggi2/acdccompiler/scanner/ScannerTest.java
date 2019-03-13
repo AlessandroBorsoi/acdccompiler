@@ -2,8 +2,6 @@ package it.uniupo.disit.linguaggi2.acdccompiler.scanner;
 
 import it.uniupo.disit.linguaggi2.acdccompiler.token.Token;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.ValueSource;
 
 import static it.uniupo.disit.linguaggi2.acdccompiler.TestUtil.getFile;
 import static it.uniupo.disit.linguaggi2.acdccompiler.token.TokenType.*;
@@ -185,76 +183,87 @@ class ScannerTest {
         assertEquals("<EOF,r:29>", scanner.nextToken().toString());
     }
 
-    @ParameterizedTest
-    @ValueSource(strings = {
-            "invalidId.txt",
-            "invalidSymbol.txt",
-            "invalidFloat.txt",
-            "invalidInt.txt",
-            "invalidPrint.txt"})
-    void invalidIdThrowsLexicalException(String fileName) throws Exception {
-        Scanner scanner = new Scanner(getFile(fileName));
+    @Test
+    void invalidSymbolThrowsLexicalException() throws Exception {
+        Scanner scanner = new Scanner(getFile("invalidSymbol.txt"));
 
         assertThrows(LexicalException.class, scanner::nextToken);
     }
 
     @Test
     void srcProgramWithMixedValidAndInvalidTokens() throws Exception {
+        LexicalException lexicalException;
         Scanner scanner = new Scanner(getFile("mixed.txt"));
 
         assertEquals("<ID,r:1,b>", scanner.nextToken().toString());
-        assertThrows(LexicalException.class, scanner::peekToken, "<INVALID,@>");
-        assertThrows(LexicalException.class, scanner::nextToken, "<INVALID,@>");
+        lexicalException = assertThrows(LexicalException.class, scanner::peekToken);
+        assertEquals("<INVALID,r:1,@>", lexicalException.getMessage());
+        lexicalException = assertThrows(LexicalException.class, scanner::nextToken);
+        assertEquals("<INVALID,r:1,@>", lexicalException.getMessage());
         assertEquals("<ASSIGN,r:1>", scanner.peekToken().toString());
         assertEquals("<ASSIGN,r:1>", scanner.nextToken().toString());
-        assertThrows(LexicalException.class, scanner::peekToken, "<INVALID,invalid>");
-        assertThrows(LexicalException.class, scanner::nextToken, "<INVALID,invalid>");
-        assertEquals("<FNUM,3.2>", scanner.nextToken().toString());
-        assertThrows(LexicalException.class, scanner::peekToken, "<INVALID,pippo>");
-        assertThrows(LexicalException.class, scanner::nextToken, "<INVALID,pippo>");
-        assertThrows(LexicalException.class, scanner::nextToken, "<INVALID,@>");
-        assertThrows(LexicalException.class, scanner::nextToken, "<INVALID,#>");
-        assertThrows(LexicalException.class, scanner::peekToken, "<INVALID,[>");
-        assertThrows(LexicalException.class, scanner::nextToken, "<INVALID,[>");
-        assertThrows(LexicalException.class, scanner::nextToken, "<INVALID,]>");
-        assertEquals("<EOF>", scanner.nextToken().toString());
+        lexicalException = assertThrows(LexicalException.class, scanner::peekToken);
+        assertEquals("<INVALID,r:1,INVALID>", lexicalException.getMessage());
+        lexicalException = assertThrows(LexicalException.class, scanner::nextToken);
+        assertEquals("<INVALID,r:1,INVALID>", lexicalException.getMessage());
+        assertEquals("<FNUM,r:1,3.2>", scanner.peekToken().toString());
+        assertEquals("<FNUM,r:1,3.2>", scanner.nextToken().toString());
+        lexicalException = assertThrows(LexicalException.class, scanner::peekToken);
+        assertEquals("<INVALID,r:1,PIPPO>", lexicalException.getMessage());
+        lexicalException = assertThrows(LexicalException.class, scanner::nextToken);
+        assertEquals("<INVALID,r:1,PIPPO>", lexicalException.getMessage());
+        lexicalException = assertThrows(LexicalException.class, scanner::peekToken);
+        assertEquals("<INVALID,r:1,@>", lexicalException.getMessage());
+        lexicalException = assertThrows(LexicalException.class, scanner::nextToken);
+        assertEquals("<INVALID,r:1,@>", lexicalException.getMessage());
+        lexicalException = assertThrows(LexicalException.class, scanner::peekToken);
+        assertEquals("<INVALID,r:1,#>", lexicalException.getMessage());
+        lexicalException = assertThrows(LexicalException.class, scanner::nextToken);
+        assertEquals("<INVALID,r:1,#>", lexicalException.getMessage());
+        lexicalException = assertThrows(LexicalException.class, scanner::peekToken);
+        assertEquals("<INVALID,r:1,[>", lexicalException.getMessage());
+        lexicalException = assertThrows(LexicalException.class, scanner::nextToken);
+        assertEquals("<INVALID,r:1,[>", lexicalException.getMessage());
+        lexicalException = assertThrows(LexicalException.class, scanner::peekToken);
+        assertEquals("<INVALID,r:1,]>", lexicalException.getMessage());
+        lexicalException = assertThrows(LexicalException.class, scanner::nextToken);
+        assertEquals("<INVALID,r:1,]>", lexicalException.getMessage());
+        assertEquals("<EOF,r:1>", scanner.nextToken().toString());
     }
 
-    @ParameterizedTest
-    @ValueSource(strings = {"src.txt", "srcWithOnlyNecessarySpaces.txt", "srcWithRandomSpaces.txt"})
-    void srcProgramWithPeekTokenReturnsAValidStreamOfTokens(String fileName) throws Exception {
-        Scanner scanner = new Scanner(getFile(fileName));
+    @Test
+    void srcProgramWithPeekTokenReturnsAValidStreamOfTokens() throws Exception {
+        Scanner scanner = new Scanner(getFile("src.txt"));
 
-        assertEquals("<FLOATDCL>", scanner.peekToken().toString());
-        assertEquals("<FLOATDCL>", scanner.nextToken().toString());
-        assertEquals("<ID,b>", scanner.peekToken().toString());
-        assertEquals("<ID,b>", scanner.nextToken().toString());
-        assertEquals("<INTDCL>", scanner.peekToken().toString());
-        assertEquals("<INTDCL>", scanner.nextToken().toString());
-        assertEquals("<ID,a>", scanner.peekToken().toString());
-        assertEquals("<ID,a>", scanner.nextToken().toString());
-        assertEquals("<ID,a>", scanner.peekToken().toString());
-        assertEquals("<ID,a>", scanner.nextToken().toString());
-        assertEquals("<ASSIGN>", scanner.peekToken().toString());
-        assertEquals("<ASSIGN>", scanner.nextToken().toString());
-        assertEquals("<INUM,5>", scanner.peekToken().toString());
-        assertEquals("<INUM,5>", scanner.nextToken().toString());
-        assertEquals("<ID,b>", scanner.peekToken().toString());
-        assertEquals("<ID,b>", scanner.nextToken().toString());
-        assertEquals("<ASSIGN>", scanner.peekToken().toString());
-        assertEquals("<ASSIGN>", scanner.nextToken().toString());
-        assertEquals("<ID,a>", scanner.peekToken().toString());
-        assertEquals("<ID,a>", scanner.nextToken().toString());
-        assertEquals("<PLUS>", scanner.peekToken().toString());
-        assertEquals("<PLUS>", scanner.nextToken().toString());
-        assertEquals("<FNUM,3.2>", scanner.peekToken().toString());
-        assertEquals("<FNUM,3.2>", scanner.nextToken().toString());
-        assertEquals("<PRINT>", scanner.peekToken().toString());
-        assertEquals("<PRINT>", scanner.nextToken().toString());
-        assertEquals("<ID,b>", scanner.peekToken().toString());
-        assertEquals("<ID,b>", scanner.nextToken().toString());
-        assertEquals("<EOF>", scanner.peekToken().toString());
-        assertEquals("<EOF>", scanner.peekToken().toString());
-        assertEquals("<EOF>", scanner.nextToken().toString());
+        assertEquals("<FLOAT,r:1>", scanner.peekToken().toString());
+        assertEquals("<FLOAT,r:1>", scanner.nextToken().toString());
+        assertEquals("<ID,r:1,b>", scanner.peekToken().toString());
+        assertEquals("<ID,r:1,b>", scanner.nextToken().toString());
+        assertEquals("<INT,r:2>", scanner.peekToken().toString());
+        assertEquals("<INT,r:2>", scanner.nextToken().toString());
+        assertEquals("<ID,r:2,a>", scanner.peekToken().toString());
+        assertEquals("<ID,r:2,a>", scanner.nextToken().toString());
+        assertEquals("<ID,r:3,a>", scanner.peekToken().toString());
+        assertEquals("<ID,r:3,a>", scanner.nextToken().toString());
+        assertEquals("<ASSIGN,r:3>", scanner.peekToken().toString());
+        assertEquals("<ASSIGN,r:3>", scanner.nextToken().toString());
+        assertEquals("<INUM,r:3,5>", scanner.peekToken().toString());
+        assertEquals("<INUM,r:3,5>", scanner.nextToken().toString());
+        assertEquals("<ID,r:4,b>", scanner.peekToken().toString());
+        assertEquals("<ID,r:4,b>", scanner.nextToken().toString());
+        assertEquals("<ASSIGN,r:4>", scanner.peekToken().toString());
+        assertEquals("<ASSIGN,r:4>", scanner.nextToken().toString());
+        assertEquals("<ID,r:4,a>", scanner.peekToken().toString());
+        assertEquals("<ID,r:4,a>", scanner.nextToken().toString());
+        assertEquals("<PLUS,r:4>", scanner.peekToken().toString());
+        assertEquals("<PLUS,r:4>", scanner.nextToken().toString());
+        assertEquals("<FNUM,r:4,3.2>", scanner.peekToken().toString());
+        assertEquals("<FNUM,r:4,3.2>", scanner.nextToken().toString());
+        assertEquals("<PRINT,r:5>", scanner.peekToken().toString());
+        assertEquals("<PRINT,r:5>", scanner.nextToken().toString());
+        assertEquals("<ID,r:5,b>", scanner.peekToken().toString());
+        assertEquals("<ID,r:5,b>", scanner.nextToken().toString());
+        assertEquals("<EOF,r:6>", scanner.peekToken().toString());
+        assertEquals("<EOF,r:6>", scanner.nextToken().toString());
     }
 }

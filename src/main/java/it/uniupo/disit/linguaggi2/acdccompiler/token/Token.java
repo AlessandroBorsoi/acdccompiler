@@ -1,7 +1,5 @@
 package it.uniupo.disit.linguaggi2.acdccompiler.token;
 
-import java.util.Objects;
-
 import static java.util.Objects.requireNonNull;
 
 public class Token {
@@ -24,10 +22,6 @@ public class Token {
         return new Token(row, type, null);
     }
 
-    public int getRow() {
-        return row;
-    }
-
     public TokenType getType() {
         return type;
     }
@@ -46,17 +40,4 @@ public class Token {
         return builder.append(">").toString();
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Token token = (Token) o;
-        return type == token.type &&
-                Objects.equals(value, token.value);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(type, value);
-    }
 }
