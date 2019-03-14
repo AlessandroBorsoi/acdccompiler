@@ -9,12 +9,14 @@ import java.io.IOException;
 import java.io.PushbackReader;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Predicate;
 
 import static it.uniupo.disit.linguaggi2.acdccompiler.token.TokenType.*;
 import static java.lang.Character.*;
 
 class Scanner {
 
+    private static final char EOF = 0xFFFF;
     private static final Set<Character> SKIP_CHARS = Set.of(' ', '\n', '\t', '\r');
     private static final Map<String, TokenType> KEYWORDS = Map.of(
             "float", FLOAT,
@@ -56,8 +58,10 @@ class Scanner {
 
     private Token scanNextToken() throws IOException {
         char nextChar = readChar();
-        while (isBlank(nextChar))
+        while (isBlank(nextChar)) {
+            if (nextChar == '\n') row++;
             nextChar = readChar();
+        }
         if (isDigit(nextChar))
             return scanNumber(nextChar);
         if (isLetter(nextChar) && isLowerCase(nextChar))
@@ -65,8 +69,49 @@ class Scanner {
         if (isOperator(nextChar))
             return Token.of(row, OPERATORS.get(nextChar));
         if (isEOF(nextChar))
-            return Token.of(row, EOF);
-        return getInvalidToken(nextChar);
+            return Token.of(row, TokenType.EOF);
+        return invalidToken(nextChar);
+    }
+
+    private boolean isBlank(char nextChar) {
+        return SKIP_CHARS.contains(nextChar);
+    }
+
+    private boolean isOperator(char nextChar) {
+        return OPERATORS.containsKey(nextChar);
+    }
+
+    private Token scanNumber(char nextChar) throws IOException {
+        StringBuilder builder = new StringBuilder().append(nextChar);
+        appendWhile(Character::isDigit, builder);
+        nextChar = readChar();
+        if (nextChar != '.') {
+            buffer.unread(nextChar);
+            return Token.of(row, INUM, builder.toString());
+        } else {
+            builder.append(nextChar);
+            appendWhile(Character::isDigit, builder);
+            return Token.of(row, FNUM, builder.toString());
+        }
+    }
+
+    private Token scanId(char nextChar) throws IOException {
+        StringBuilder builder = new StringBuilder().append(nextChar);
+        appendWhile(c -> isLetter(c) && isLowerCase(c), builder);
+        String id = builder.toString();
+        if (KEYWORDS.containsKey(id))
+            return Token.of(row, KEYWORDS.get(id));
+        return Token.of(row, ID, id);
+    }
+
+    private boolean isEOF(char nextChar) {
+        return nextChar == EOF;
+    }
+
+    private Token invalidToken(char nextChar) throws IOException {
+        StringBuilder builder = new StringBuilder().append(nextChar);
+        appendWhile(Character::isLetter, builder);
+        return Token.of(row, INVALID, builder.toString());
     }
 
     private Token checkInvalid(Token token) throws LexicalException {
@@ -75,74 +120,13 @@ class Scanner {
         return token;
     }
 
-    private boolean isBlank(char nextChar) {
-        if (nextChar == '\n') row++;
-        return SKIP_CHARS.contains(nextChar);
-    }
-
-    private boolean isOperator(char nextChar) throws IOException {
-        return OPERATORS.containsKey(nextChar) && isValid(nextChar);
-    }
-
-    private boolean isValid(char nextChar) throws IOException {
-        if (isLetter(nextChar))
-            return !isLetter(peekChar());
-        return true;
-    }
-
-    private Token scanNumber(char nextChar) throws IOException {
-        StringBuilder builder = new StringBuilder().append(nextChar);
-        nextChar = appendDigits(builder);
-        if ((nextChar != '.')) {
-            buffer.unread(nextChar);
-            return Token.of(row, INUM, builder.toString());
-        }
-        builder.append(nextChar);
-        buffer.unread(appendDigits(builder));
-        return Token.of(row, FNUM, builder.toString());
-    }
-
-    private char appendDigits(StringBuilder builder) throws IOException {
+    private void appendWhile(Predicate<Character> condition, StringBuilder builder) throws IOException {
         char nextChar = readChar();
-        while (isDigit(nextChar)) {
+        while (condition.test(nextChar)) {
             builder.append(nextChar);
             nextChar = readChar();
         }
-        return nextChar;
-    }
-
-    private Token scanId(char nextChar) throws IOException {
-        StringBuilder builder = new StringBuilder();
-        do {
-            builder.append(nextChar);
-            nextChar = readChar();
-        } while (isLetter(nextChar) && isLowerCase(nextChar));
         buffer.unread(nextChar);
-        String id = builder.toString();
-        if (KEYWORDS.containsKey(id))
-            return Token.of(row, KEYWORDS.get(id));
-        return Token.of(row, ID, id);
-    }
-
-    private boolean isEOF(char nextChar) {
-        return nextChar == 0xFFFF;
-    }
-
-    private Token getInvalidToken(int nextChar) throws IOException {
-        StringBuilder builder = new StringBuilder().append(((char) nextChar));
-        int invalidChar = readChar();
-        while (isLetter(invalidChar)) {
-            builder.append(((char) invalidChar));
-            invalidChar = readChar();
-        }
-        buffer.unread(invalidChar);
-        return Token.of(row, INVALID, builder.toString());
-    }
-
-    private int peekChar() throws IOException {
-        int currentChar = readChar();
-        buffer.unread(currentChar);
-        return currentChar;
     }
 
     private char readChar() throws IOException {
