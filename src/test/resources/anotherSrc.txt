@@ -1,9 +1,0 @@
-f a
-f b
-f c
-a = 5
-p a
-b = a + 3.2
-p b
-c = b + b + a - 2.2
-p c
