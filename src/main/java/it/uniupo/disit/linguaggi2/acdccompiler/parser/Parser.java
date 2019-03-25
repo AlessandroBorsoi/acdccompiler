@@ -20,11 +20,11 @@ public class Parser {
     }
 
     public boolean parse() throws IOException, LexicalException, SyntacticException {
-        parseProg();
+        parsePrg();
         return true;
     }
 
-    private void parseProg() throws IOException, LexicalException, SyntacticException {
+    private void parsePrg() throws IOException, LexicalException, SyntacticException {
         Token token = scanner.peekToken();
         switch (token.getType()) {
             case FLOAT:
@@ -36,7 +36,7 @@ public class Parser {
                 match(EOF);
                 return;
         }
-        throw new SyntacticException(token, PROG);
+        throw new SyntacticException(token, PRG);
     }
 
     private void parseDSs() throws IOException, LexicalException, SyntacticException {
