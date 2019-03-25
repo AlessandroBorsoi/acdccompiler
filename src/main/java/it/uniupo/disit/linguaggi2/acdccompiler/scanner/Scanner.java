@@ -14,7 +14,7 @@ import java.util.function.Predicate;
 import static it.uniupo.disit.linguaggi2.acdccompiler.token.TokenType.*;
 import static java.lang.Character.*;
 
-class Scanner {
+public class Scanner {
 
     private static final char EOF = 0xFFFF;
     private static final Set<Character> SKIP_CHARS = Set.of(' ', '\n', '\t', '\r');
@@ -33,13 +33,13 @@ class Scanner {
     private Token nextToken;
     private int row;
 
-    Scanner(String fileName) throws FileNotFoundException {
+    public Scanner(String fileName) throws FileNotFoundException {
         this.buffer = new PushbackReader(new FileReader(fileName));
         this.nextToken = null;
         this.row = 1;
     }
 
-    Token nextToken() throws IOException, LexicalException {
+    public Token nextToken() throws IOException, LexicalException {
         Token currentToken;
         if (nextToken == null) {
             currentToken = scanNextToken();
@@ -50,7 +50,7 @@ class Scanner {
         return checkInvalid(currentToken);
     }
 
-    Token peekToken() throws IOException, LexicalException {
+    public Token peekToken() throws IOException, LexicalException {
         if (nextToken == null)
             nextToken = scanNextToken();
         return checkInvalid(nextToken);
