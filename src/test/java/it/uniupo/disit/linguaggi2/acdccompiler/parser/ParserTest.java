@@ -18,7 +18,7 @@ class ParserTest {
     void parseRightSrcProgramReturnsTrue(String fileName) throws Exception {
         Parser parser = new Parser(new Scanner(getFile(fileName)));
 
-        assertTrue(parser.parse());
+        assertNotNull(parser.parse());
     }
 
     @ParameterizedTest
