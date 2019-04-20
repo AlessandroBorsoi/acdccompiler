@@ -105,10 +105,10 @@ public class Parser {
         switch (token.getType()) {
             case PLUS:
                 match(PLUS);
-                return new NodeBinOp(PLUS_OP, left, parseExpP(parseTr()));
+                return parseExpP(new NodeBinOp(PLUS_OP, left, parseTr()));
             case MINUS:
                 match(MINUS);
-                return new NodeBinOp(MINUS_OP, left, parseExpP(parseTr()));
+                return parseExpP(new NodeBinOp(MINUS_OP, left, parseTr()));
             case FLOAT:
             case INT:
             case ID:
@@ -135,10 +135,10 @@ public class Parser {
         switch (token.getType()) {
             case TIMES:
                 match(TIMES);
-                return new NodeBinOp(TIMES_OP, left, parseTrP(parseVal()));
+                return parseTrP(new NodeBinOp(TIMES_OP, left, parseVal()));
             case DIV:
                 match(DIV);
-                return new NodeBinOp(DIV_OP, left, parseTrP(parseVal()));
+                return parseTrP(new NodeBinOp(DIV_OP, left, parseVal()));
             case PLUS:
             case MINUS:
             case FLOAT:

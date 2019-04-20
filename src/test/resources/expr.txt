@@ -1,0 +1,4 @@
+int temp
+temp = 1
+float res
+res = 3 + 5 * 7 / 8.3 - temp
