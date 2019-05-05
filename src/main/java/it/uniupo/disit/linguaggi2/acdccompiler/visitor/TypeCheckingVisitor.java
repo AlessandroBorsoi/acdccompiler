@@ -17,7 +17,7 @@ public class TypeCheckingVisitor implements IVisitor {
 
     @Override
     public void visit(NodeProgram node) {
-
+        node.getDecSts().forEach(nodeDecSt -> nodeDecSt.accept(this));
     }
 
     @Override
@@ -47,32 +47,79 @@ public class TypeCheckingVisitor implements IVisitor {
 
     @Override
     public void visit(NodePrint node) {
-
+        NodeId id = node.getId();
+        id.accept(this);
+        if (id.getResType() == ERROR) {
+            node.setResType(ERROR);
+            logError("Error on print");
+        }
     }
 
     @Override
     public void visit(NodeAssign node) {
-
+        NodeId id = node.getId();
+        id.accept(this);
+        NodeExpr expr = node.getExpr();
+        expr.accept(this);
+        TypeDescriptor idType = id.getResType();
+        TypeDescriptor exprType = expr.getResType();
+        if (compatible(idType, exprType)) {
+            if (idType != exprType) node.setExpr(convert(expr));
+        } else {
+            node.setResType(ERROR);
+            logError("type " + idType + " not compatible with " + exprType);
+        }
     }
 
     @Override
     public void visit(NodeCost node) {
-
+        node.setResType(getResultType(node.getType()));
     }
 
     @Override
     public void visit(NodeDeref node) {
-
+        NodeId id = node.getId();
+        id.accept(this);
+        node.setResType(id.getResType());
     }
 
     @Override
     public void visit(NodeBinOp node) {
-
+        NodeExpr exprLeft = node.getLeft();
+        exprLeft.accept(this);
+        NodeExpr exprRight = node.getRight();
+        exprRight.accept(this);
+        TypeDescriptor resTypeLeft = exprLeft.getResType();
+        TypeDescriptor resTypeRight = exprRight.getResType();
+        if (resTypeLeft == ERROR) {
+            node.setResType(ERROR);
+            logError("Left expression has error(s)");
+        } else if (resTypeRight == ERROR) {
+            node.setResType(ERROR);
+            logError("Right expression has error(s)");
+        } else if (resTypeLeft == resTypeRight) {
+            node.setResType(resTypeLeft);
+        } else {
+            node.setLeft(convert(exprLeft));
+            node.setRight(convert(exprRight));
+            node.setResType(FLOAT);
+        }
     }
 
     @Override
-    public void visit(NodeConv node) {
+    public void visit(NodeConvert node) {
+        NodeExpr expr = node.getExpr();
+        expr.accept(this);
+        if (expr.getResType() != INT) {
+            node.setResType(ERROR);
+        } else {
+            node.setResType(FLOAT);
+        }
+    }
 
+    @Override
+    public String output() {
+        return log.toString();
     }
 
     private void logError(String message) {
@@ -81,11 +128,12 @@ public class TypeCheckingVisitor implements IVisitor {
         log.append(message);
     }
 
-    private boolean compatibile(TypeDescriptor t1, TypeDescriptor t2) {
+    private boolean compatible(TypeDescriptor t1, TypeDescriptor t2) {
         return t1 != ERROR && (t1 == t2 || (t1 == FLOAT && t2 == INT));
     }
 
-    private NodeExpr converti(NodeExpr node) {
-        return null;
+    private NodeExpr convert(NodeExpr node) {
+        if (node.getResType() == FLOAT) return node;
+        else return new NodeConvert(node, FLOAT);
     }
 }

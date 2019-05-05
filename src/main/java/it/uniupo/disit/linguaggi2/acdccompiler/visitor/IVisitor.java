@@ -1,7 +1,6 @@
 package it.uniupo.disit.linguaggi2.acdccompiler.visitor;
 
 import it.uniupo.disit.linguaggi2.acdccompiler.ast.*;
-import it.uniupo.disit.linguaggi2.acdccompiler.symboltable.Attributes;
 
 import static it.uniupo.disit.linguaggi2.acdccompiler.ast.TypeDescriptor.FLOAT;
 import static it.uniupo.disit.linguaggi2.acdccompiler.ast.TypeDescriptor.INT;
@@ -24,7 +23,9 @@ public interface IVisitor {
 
     void visit(NodeBinOp node);
 
-    void visit(NodeConv node);
+    void visit(NodeConvert node);
+
+    String output();
 
     default TypeDescriptor getResultType(LangType type) {
         return type == LangType.INT_TYPE ? INT : FLOAT;

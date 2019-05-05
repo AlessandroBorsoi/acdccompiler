@@ -1,5 +1,7 @@
 package it.uniupo.disit.linguaggi2.acdccompiler.ast;
 
+import it.uniupo.disit.linguaggi2.acdccompiler.visitor.IVisitor;
+
 import static java.util.Objects.requireNonNull;
 
 public class NodePrint extends NodeStm {
@@ -19,6 +21,11 @@ public class NodePrint extends NodeStm {
         return "NodePrint{" +
                 "id=" + id +
                 '}';
+    }
+
+    @Override
+    public void accept(IVisitor visitor) {
+        visitor.visit(this);
     }
 
 }

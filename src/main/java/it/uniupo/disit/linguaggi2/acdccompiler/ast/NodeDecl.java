@@ -1,5 +1,7 @@
 package it.uniupo.disit.linguaggi2.acdccompiler.ast;
 
+import it.uniupo.disit.linguaggi2.acdccompiler.visitor.IVisitor;
+
 import static java.util.Objects.requireNonNull;
 
 public class NodeDecl extends NodeDecSt {
@@ -26,6 +28,11 @@ public class NodeDecl extends NodeDecSt {
                 "id=" + id.toString() +
                 ", type=" + type +
                 '}';
+    }
+
+    @Override
+    public void accept(IVisitor visitor) {
+        visitor.visit(this);
     }
 
 }

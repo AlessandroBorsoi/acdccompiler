@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class SymTable {
+
     private static Map<String, Attributes> table;
 
     public static void init() {
