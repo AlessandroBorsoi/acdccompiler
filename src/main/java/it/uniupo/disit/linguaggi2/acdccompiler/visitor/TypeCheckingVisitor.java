@@ -51,7 +51,6 @@ public class TypeCheckingVisitor implements IVisitor {
         id.accept(this);
         if (id.getResType() == ERROR) {
             node.setResType(ERROR);
-            logError("Error on print");
         }
     }
 
@@ -63,11 +62,11 @@ public class TypeCheckingVisitor implements IVisitor {
         expr.accept(this);
         TypeDescriptor idType = id.getResType();
         TypeDescriptor exprType = expr.getResType();
-        if (compatible(idType, exprType)) {
-            if (idType != exprType) node.setExpr(convert(expr));
-        } else {
+        if (!compatible(idType, exprType)) {
             node.setResType(ERROR);
             logError("type " + idType + " not compatible with " + exprType);
+        } else if (idType != exprType) {
+            node.setExpr(convert(expr));
         }
     }
 
@@ -91,12 +90,8 @@ public class TypeCheckingVisitor implements IVisitor {
         exprRight.accept(this);
         TypeDescriptor resTypeLeft = exprLeft.getResType();
         TypeDescriptor resTypeRight = exprRight.getResType();
-        if (resTypeLeft == ERROR) {
+        if (resTypeLeft == ERROR || resTypeRight == ERROR) {
             node.setResType(ERROR);
-            logError("Left expression has error(s)");
-        } else if (resTypeRight == ERROR) {
-            node.setResType(ERROR);
-            logError("Right expression has error(s)");
         } else if (resTypeLeft == resTypeRight) {
             node.setResType(resTypeLeft);
         } else {
@@ -112,6 +107,7 @@ public class TypeCheckingVisitor implements IVisitor {
         expr.accept(this);
         if (expr.getResType() != INT) {
             node.setResType(ERROR);
+            logError("Cannot convert type " + expr.getResType());
         } else {
             node.setResType(FLOAT);
         }
