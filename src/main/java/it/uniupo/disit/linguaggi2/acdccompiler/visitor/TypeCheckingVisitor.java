@@ -6,6 +6,7 @@ import it.uniupo.disit.linguaggi2.acdccompiler.symboltable.SymTable;
 
 import static it.uniupo.disit.linguaggi2.acdccompiler.ast.TypeDescriptor.*;
 import static it.uniupo.disit.linguaggi2.acdccompiler.symboltable.SymTable.enter;
+import static it.uniupo.disit.linguaggi2.acdccompiler.visitor.Register.newRegister;
 
 public class TypeCheckingVisitor implements IVisitor {
 
@@ -36,7 +37,7 @@ public class TypeCheckingVisitor implements IVisitor {
     public void visit(NodeDecl node) {
         NodeId id = node.getId();
         LangType td = node.getType();
-        Attributes attr = new Attributes(td);
+        Attributes attr = new Attributes(td, newRegister());
         if (!enter(id.getName(), attr)) {
             node.setResType(ERROR);
             logError("id: '" + id.getName() + "' of type: '" + node.getType() + "' is duplicated");

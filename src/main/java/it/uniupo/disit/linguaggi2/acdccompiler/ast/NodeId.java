@@ -22,6 +22,10 @@ public class NodeId extends NodeAST {
         this.definition = definition;
     }
 
+    public Attributes getDefinition() {
+        return definition;
+    }
+
     @Override
     public String toString() {
         return "NodeId{" +
