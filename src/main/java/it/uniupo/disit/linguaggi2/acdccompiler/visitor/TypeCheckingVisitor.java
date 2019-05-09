@@ -6,7 +6,6 @@ import it.uniupo.disit.linguaggi2.acdccompiler.symboltable.SymTable;
 
 import static it.uniupo.disit.linguaggi2.acdccompiler.ast.TypeDescriptor.*;
 import static it.uniupo.disit.linguaggi2.acdccompiler.symboltable.SymTable.enter;
-import static it.uniupo.disit.linguaggi2.acdccompiler.visitor.Register.newRegister;
 
 public class TypeCheckingVisitor implements IVisitor {
 
