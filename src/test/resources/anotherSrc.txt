@@ -1,6 +1,6 @@
-int a
-float b
-b = 1.0 / 6
-print b
-a = 1 / 6
-print a
+int foo
+float bar
+bar = 1.0 / 6
+print bar
+foo = 1 / 6
+print foo

@@ -7,11 +7,10 @@ import static java.util.Objects.requireNonNull;
 public class Attributes {
 
     private final LangType type;
-    private final char register;
+    private char register;
 
-    public Attributes(LangType type, char register) {
+    public Attributes(LangType type) {
         this.type = requireNonNull(type);
-        this.register = register;
     }
 
     public LangType getType() {
@@ -24,5 +23,9 @@ public class Attributes {
 
     public char getRegister() {
         return register;
+    }
+
+    public void setRegister(char register) {
+        this.register = register;
     }
 }

@@ -27,8 +27,7 @@ class CodeGeneratorVisitorTest {
         nodeAST.accept(new TypeCheckingVisitor());
         nodeAST.accept(visitor);
 
-        assertEquals(
-                "5 sa 0 k la 5 k 3.2 + sb 0 k lb p sz", visitor.output());
+        assertEquals("5 sb 0 k lb 5 k 3.2 + sa 0 k la p sz", visitor.output());
     }
 
     @Test
@@ -38,7 +37,6 @@ class CodeGeneratorVisitorTest {
         nodeAST.accept(new TypeCheckingVisitor());
         nodeAST.accept(visitor);
 
-        assertEquals(
-                "1.0 6 5 k / sb 0 k lb p sz 1 6 / sa 0 k la p sz", visitor.output());
+        assertEquals("1.0 6 5 k / sb 0 k lb p sz 1 6 / sa 0 k la p sz", visitor.output());
     }
 }

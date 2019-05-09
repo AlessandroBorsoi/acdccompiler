@@ -2,6 +2,8 @@ package it.uniupo.disit.linguaggi2.acdccompiler.visitor;
 
 import it.uniupo.disit.linguaggi2.acdccompiler.ast.*;
 
+import static it.uniupo.disit.linguaggi2.acdccompiler.visitor.Register.newRegister;
+
 public class CodeGeneratorVisitor implements IVisitor {
 
     private static final String PRINT = "p";
@@ -15,6 +17,7 @@ public class CodeGeneratorVisitor implements IVisitor {
 
     CodeGeneratorVisitor() {
         this.code = new StringBuilder();
+        Register.init();
     }
 
     @Override
@@ -29,12 +32,12 @@ public class CodeGeneratorVisitor implements IVisitor {
 
     @Override
     public void visit(NodeDecl node) {
-
+        node.getId().getDefinition().setRegister(newRegister());
     }
 
     @Override
     public void visit(NodePrint node) {
-        emit(REGISTER_TO_STACK + node.getId().getName());
+        emit(REGISTER_TO_STACK + node.getId().getDefinition().getRegister());
         emit(PRINT);
         emit(REMOVE_FROM_STACK);
     }
@@ -42,7 +45,7 @@ public class CodeGeneratorVisitor implements IVisitor {
     @Override
     public void visit(NodeAssign node) {
         node.getExpr().accept(this);
-        emit(STACK_TO_REGISTER + node.getId().getDefinition());
+        emit(STACK_TO_REGISTER + node.getId().getDefinition().getRegister());
         emit(RESET_PRECISION);
     }
 
@@ -53,7 +56,7 @@ public class CodeGeneratorVisitor implements IVisitor {
 
     @Override
     public void visit(NodeDeref node) {
-        emit(REGISTER_TO_STACK + node.getId().getName());
+        emit(REGISTER_TO_STACK + node.getId().getDefinition().getRegister());
     }
 
     @Override

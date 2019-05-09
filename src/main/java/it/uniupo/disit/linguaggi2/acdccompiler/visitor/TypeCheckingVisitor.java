@@ -37,7 +37,7 @@ public class TypeCheckingVisitor implements IVisitor {
     public void visit(NodeDecl node) {
         NodeId id = node.getId();
         LangType td = node.getType();
-        Attributes attr = new Attributes(td, newRegister());
+        Attributes attr = new Attributes(td);
         if (!enter(id.getName(), attr)) {
             node.setResType(ERROR);
             logError("id: '" + id.getName() + "' of type: '" + node.getType() + "' is duplicated");
