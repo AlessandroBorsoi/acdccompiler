@@ -21,6 +21,16 @@ class TypeCheckingVisitorTest {
     }
 
     @Test
+    void visitNodesWithAssignWithoutDecl() throws Exception {
+        Parser parser = new Parser(new Scanner(getFile("assignWithoutDecl.txt")));
+        NodeAST nodeAST = parser.parse();
+        nodeAST.accept(visitor);
+
+        assertEquals("id: 'bar' never declared\n" +
+                "type ERROR not compatible with INT", visitor.output());
+    }
+
+    @Test
     void visitNodesWithoutErrorsReturnsNoErrors() throws Exception {
         Parser parser = new Parser(new Scanner(getFile("src.txt")));
         NodeAST nodeAST = parser.parse();
